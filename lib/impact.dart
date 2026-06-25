@@ -17,7 +17,6 @@ class Impact extends StatefulWidget {
 class _ImpactState extends State<Impact> {
   final UsageStorageService _storageService = UsageStorageService();
 
-  // This screen is the second step, so we initialize the controller to page 1.
   final PageController _pageController = PageController(initialPage: 1);
 
   int _estimatedUsage = 0;
