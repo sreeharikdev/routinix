@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:routinix/hourinput.dart';
@@ -9,46 +11,198 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
-final _controller=PageController();
+
 class _LoginState extends State<Login> {
+  final PageController _controller = PageController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(0, 7, 12, 20),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 134, left: 48.81),
-            child: Container(
-              height: 317.37,
-              width: 312.48,
-              child: Column(spacing: 50,children: [Image.asset('assets/images/Group.png',width: 119.69,height: 121.48,),
-              Container(width: 317.37,height: 112,child: Column(
-                children: [
-                  Text.rich(textAlign: TextAlign.center,(TextSpan(text:'Stop letting distractions decide your',style: GoogleFonts.oxanium(color: Colors.white,fontSize: 25.39,fontWeight: FontWeight(600)),children: <TextSpan>[TextSpan(text: ' Future',style: GoogleFonts.oxanium(color: Colors.amber,fontSize: 25.39,fontWeight: FontWeight(600)))]) )),
-                  Text('Build routines. Stay focused. Avoid distractions.',textAlign: TextAlign.center,style: GoogleFonts.inter(fontSize: 14,color: Color.fromARGB(255, 255, 255, 255)),)
-                ],
-              ),),
-              
-              ]),
+      backgroundColor: const Color.fromARGB(221, 32, 31, 28),
+      body: Stack(
+        children: [Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: RadialGradient(
+                    radius: 3,
+                    center: AlignmentGeometry.topLeft,
+                    colors: [Color.fromARGB(19, 223, 184, 43), Colors.black,Colors.black,Color.fromARGB(19, 223, 184, 43)],
+                    stops: [0.0, 0.4,0.5,1],
+                  ),
+                ),
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 200,left: 46.96),
-            child: SmoothPageIndicator(controller: _controller, count: 3,effect: ColorTransitionEffect(activeDotColor: Colors.yellowAccent,dotColor: Color.fromARGB(226, 255, 255, 255)),)
+          
+          Positioned.fill(
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 60.0, sigmaY: 60.0),
+                child: Container(color: const Color.fromARGB(24, 49, 81, 110)),
+              ),
+            ),
+          ),SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final contentWidth = constraints.maxWidth.clamp(0.0, 420.0);
+              final isShort = constraints.maxHeight < 700;
+        
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
+                      child: SizedBox(
+                        width: contentWidth,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(height: isShort ? 12 : 56),
+                            Column(
+                              children: [
+                                Image.asset(
+                                  'assets/images/Group.png',
+                                  width: isShort ? 96 : 120,
+                                  height: isShort ? 98 : 122,
+                                  fit: BoxFit.contain,
+                                ),
+                                SizedBox(height: isShort ? 28 : 50),
+                                Text.rich(
+                                  textAlign: TextAlign.center,
+                                  TextSpan(
+                                    text: 'Stop letting distractions decide your',
+                                    style: GoogleFonts.oxanium(
+                                      color: Colors.white,
+                                      fontSize: isShort ? 23 : 25.39,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: ' Future',
+                                        style: GoogleFonts.oxanium(
+                                          color: Colors.amber,
+                                          fontSize: isShort ? 23 : 25.39,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Build routines. Stay focused. Avoid distractions.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: isShort ? 56 : 140),
+                            SmoothPageIndicator(
+                              controller: _controller,
+                              count: 3,
+                              effect: const ColorTransitionEffect(
+                                activeDotColor: Colors.yellowAccent,
+                                dotColor: Color.fromARGB(226, 255, 255, 255),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Column(
+                              children: [
+                                Material(
+                                  color: Colors.amber,
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(5),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Hourinput(),
+                                        ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      height: 50,
+                                      width: double.infinity,
+                                      child: Center(
+                                        child: Text(
+                                          'Get started',
+                                          style: GoogleFonts.oxanium(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Material(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(5),
+                                    onTap: () {},
+                                    child: Container(
+                                      height: 50,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          width: .8,
+                                          color: const Color.fromARGB(
+                                            255,
+                                            223,
+                                            220,
+                                            213,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'I ALREADY HAVE AN ACCOUNT',
+                                            style: GoogleFonts.oxanium(
+                                              color: Colors.amber,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          SizedBox(height: 20,),
-          Padding(
-            padding: const EdgeInsets.only(left: 37),
-            child: Container(height: 120,width: 335,child: Column(children: [
-              Material(color: Colors.amber,borderRadius: BorderRadius.circular(5),child: InkWell(onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Hourinput()));
-              },child: Container(height: 50,width: 335,child: Align(alignment: AlignmentGeometry.center,child: Text('Get started',style: GoogleFonts.oxanium(fontSize: 20,fontWeight: FontWeight(600),),textAlign: TextAlign.center,)),)),),
-              SizedBox(height: 20,),
-              Material(color: const Color.fromARGB(0, 255, 193, 7),child: Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),border: Border.all(width: .8,color: const Color.fromARGB(255, 223, 220, 213))),height: 50,width: 335,child: Align(alignment: AlignmentGeometry.center,child: Text('I ALREADY HAVE AN ACCOUNT',style: GoogleFonts.oxanium(color: Colors.amber,fontSize: 20,fontWeight: FontWeight(600),),textAlign: TextAlign.center,)),),),
-            ],),),
-          )
-        ],
+        ),]
       ),
     );
   }
