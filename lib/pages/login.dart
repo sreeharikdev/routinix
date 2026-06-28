@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:routinix/hourinput.dart';
+import 'package:routinix/pages/hourinput.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Login extends StatefulWidget {

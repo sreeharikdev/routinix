@@ -1,10 +1,12 @@
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:app_usage/app_usage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:routinix/screentimesresults.dart';
-import 'package:routinix/usage_storage_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:routinix/providers/usage_provider.dart';
+import 'package:routinix/utils/screentimesresults.dart';
+
+
+
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Impact extends StatefulWidget {
@@ -15,65 +17,44 @@ class Impact extends StatefulWidget {
 }
 
 class _ImpactState extends State<Impact> {
-  final UsageStorageService _storageService = UsageStorageService();
+
+@override
+void initState(){
+  super.initState();
+
+  WidgetsBinding.instance.addPostFrameCallback((_){
+    _startImpactFlow();
+  });
+}
+
 
   final PageController _pageController = PageController(initialPage: 1);
 
-  int _estimatedUsage = 0;
-  int _fetchedUsage = 0;
+  
+  
+Future<void> _startImpactFlow() async {
+  
+  final shouldFetchUsage = await showPermissionDialog(context);
 
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startImpactFlow();
-    });
+  if (!shouldFetchUsage) {
+    return;
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  openUsageAccessSettings();
+
+  
+
+  if (!mounted) {
+    return;
   }
 
-  Future<void> _startImpactFlow() async {
-    await _loadSavedDataAndFetchUsage();
-  }
+  await context.read<UsageProvider>().fetchAndUpdateScreenTime();
+}
+ 
+ 
+ 
 
-  Future<void> _loadSavedData() async {
-    final savedData = await _storageService.loadUsageData();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _estimatedUsage = savedData['estimated']!;
-      _fetchedUsage = savedData['fetched']!;
-    });
-  }
-
-  Future<void> _loadSavedDataAndFetchUsage() async {
-    await _loadSavedData();
-    if (!mounted) {
-      return;
-    }
-    final shouldFetchUsage = await showPermissionDialog(context);
-    if (!shouldFetchUsage) {
-      return;
-    }
-    openUsageAccessSettings();
-    final fetchedUsage = await getScreenTimeData();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _fetchedUsage = fetchedUsage;
-    });
-    await _storageService.saveUsageData(
-      estimated: _estimatedUsage,
-      fetched: _fetchedUsage,
-    );
-  }
+ 
 
   void openUsageAccessSettings() async {
     final intent = AndroidIntent(
@@ -114,36 +95,16 @@ class _ImpactState extends State<Impact> {
     return shouldOpenSettings ?? false;
   }
 
-  Future<int> getScreenTimeData() async {
-    try {
-      DateTime endDate = DateTime.now();
-      DateTime startDate = endDate.subtract(const Duration(hours: 24));
 
-      AppUsage appUsage = AppUsage();
-      List<AppUsageInfo> infoList = await appUsage.getAppUsage(
-        startDate,
-        endDate,
-      );
 
-      int totalHours = 0;
 
-      for (var info in infoList) {
-        totalHours += info.usage.inHours;
-      }
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('fetched_phone_usage', totalHours);
-      return totalHours;
-    } catch (exception) {
-      debugPrint("Failed to fetch screen time: $exception");
-      return _fetchedUsage;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final usageProvider=context.watch<UsageProvider>();
     final result = getScreenTimeResult(
-      estimatedHours: _estimatedUsage,
-      actualHours: _fetchedUsage,
+      estimatedHours: usageProvider.estimatedUsage,
+      actualHours: usageProvider.fetchedUsage
     );
     final mainhours = result.mainHours;
     final wakingdaytext = result.wakingDayText;

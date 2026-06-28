@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/flutter_percent_indicator.dart';
-import 'package:routinix/impact.dart';
-import 'package:routinix/usage_storage_service.dart';
+import 'package:provider/provider.dart';
+import 'package:routinix/pages/impact.dart';
+import 'package:routinix/providers/usage_provider.dart';
+
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Hourinput extends StatefulWidget {
@@ -35,15 +37,7 @@ class _HourinputState extends State<Hourinput> {
 
   final PageController _pageController = PageController();
 
-  final UsageStorageService _storageService = UsageStorageService();
-  int _estimatedUsage = 0;
-  int _fetchedUsage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedData();
-  }
+ 
 
   @override
   void dispose() {
@@ -51,25 +45,7 @@ class _HourinputState extends State<Hourinput> {
     super.dispose();
   }
 
-  Future<void> _loadSavedData() async {
-    final savedData = await _storageService.loadUsageData();
-    setState(() {
-      _estimatedUsage = savedData['estimated']!;
-      _fetchedUsage = savedData['fetched']!;
-    });
-  }
-
-  Future<void> _updateUsageValues(int newEstimated, int newFetched) async {
-    setState(() {
-      _estimatedUsage = newEstimated;
-      _fetchedUsage = newFetched;
-    });
-    // Persist values locally immediately
-    await _storageService.saveUsageData(
-      estimated: _estimatedUsage,
-      fetched: _fetchedUsage,
-    );
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -280,20 +256,19 @@ class _HourinputState extends State<Hourinput> {
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
                                 onTap: () async {
-                                  await _updateUsageValues(
-                                    _counter,
-                                    _fetchedUsage,
-                                  );
-                                  if (!context.mounted) {
-                                    return;
-                                  }
+                                await context.read<UsageProvider>().updateEstimatedUsage(_counter);
+
+                                if (!context.mounted) {
+                                 return;
+                                    }
+
                                   Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const Impact(),
-                                    ),
-                                  );
-                                },
+                                           context,
+                                             MaterialPageRoute(
+                                                  builder: (context) => const Impact(),
+                                             ),
+                                              );
+                                                  },
                                 child: Container(
                                   height: 50,
                                   width: double.infinity,
